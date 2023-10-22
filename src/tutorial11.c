@@ -92,7 +92,7 @@ int main(void)
 
     INPUT: abeAB
     RESPONSE: ACK\n
-    RESULT: Display shows "41" (if on)
+    RESULT: Display shows "41" (if on)abc
 
     INPUT: abeAA
     RESPONSE: NACK\n
@@ -101,10 +101,93 @@ int main(void)
 
     /** CODE: Write your code for Ex 11.0 below this line. */
 
+
+
+
+    uint8_t x = 0; // for storing the received character in VAL state
+    uint8_t y = 0; // for storing the received character in CHECK state
+
     while (1)
     {
+        uint8_t inputChar = getchar(); // read a character from serial interface
+        
         switch (state)
         {
+            case START:
+            if (inputChar == 'a')
+                state = ESCAPE;
+            else
+                state = START;
+            break;
+
+        case ESCAPE:
+            if (inputChar == 'b')
+                state = CMD;
+            else
+                state = START;
+            break;
+
+        case CMD:
+            if (inputChar == 'c')
+                state = CMD_ON;
+            else if (inputChar == 'd')
+                state = CMD_OFF;
+            else if (inputChar == 'e')
+                state = CMD_SET;
+            else
+            {
+                printf("NACK\n");
+                state = NACK;
+            }
+            break;
+
+        case CMD_ON:
+            display_on();
+            display_hex(0);
+            printf("ACK\n");
+            state = ACK;
+            break;
+
+        case CMD_OFF:
+            display_off();
+            printf("ACK\n");
+            state = ACK;
+            break;
+
+        case CMD_SET:
+            x = inputChar; // read the next character for VAL state
+            state = VAL;
+            break;
+
+        case VAL:
+            y = inputChar; // read the next character for CHECK state
+            state = CHECK;
+            break;
+
+        case CHECK:
+            if (y == (x + 1))
+                state = CHECK_PASS;
+            else 
+            {
+                printf("NACK\n");
+                state = NACK;
+            }
+            break;
+
+        case CHECK_PASS:
+            display_hex(x); // display x as hex
+            printf("ACK\n");
+            state = ACK;
+            break;
+
+        case NACK:
+            state = START;
+            break;
+
+        case ACK:
+            state = START;
+            break;
+
         default:
             state = START;
             display_hex(0);
