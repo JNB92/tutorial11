@@ -188,9 +188,7 @@ while (1)
 
         default:
             state = START;
-            display_hex(0);
-            display_off();
+            break; 
+        }
     }
-}
-
 }
