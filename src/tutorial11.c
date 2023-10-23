@@ -102,25 +102,23 @@ int main(void)
     /** CODE: Write your code for Ex 11.0 below this line. */
 
 
-
-
     uint8_t x = 0; // for storing the received character in VAL state
     uint8_t y = 0; // for storing the received character in CHECK state
 
-    while (1)
+     uint8_t inputChar;
+
+while (1)
+{
+    switch (state)
     {
-        uint8_t inputChar = getchar(); // read a character from serial interface
-        
-        switch (state)
-        {
-            case START:
+        case START:
+            inputChar = getchar();  // Read a character only in this state
             if (inputChar == 'a')
                 state = ESCAPE;
-            else
-                state = START;
             break;
 
         case ESCAPE:
+            inputChar = getchar();  // Read a character only in this state
             if (inputChar == 'b')
                 state = CMD;
             else
@@ -128,6 +126,7 @@ int main(void)
             break;
 
         case CMD:
+            inputChar = getchar();  // Read a character only in this state
             if (inputChar == 'c')
                 state = CMD_ON;
             else if (inputChar == 'd')
@@ -143,7 +142,6 @@ int main(void)
 
         case CMD_ON:
             display_on();
-            display_hex(0);
             printf("ACK\n");
             state = ACK;
             break;
@@ -155,12 +153,12 @@ int main(void)
             break;
 
         case CMD_SET:
-            x = inputChar; // read the next character for VAL state
+            x = getchar(); // Read the next character only in this state
             state = VAL;
             break;
 
         case VAL:
-            y = inputChar; // read the next character for CHECK state
+            y = getchar(); // Read the next character only in this state
             state = CHECK;
             break;
 
@@ -192,6 +190,7 @@ int main(void)
             state = START;
             display_hex(0);
             display_off();
-        }
     }
+}
+
 }
